@@ -61,7 +61,6 @@
 2. 或使用命令行：
    ```bash
    CC98Autosign.exe
-   CC98Autosign.exe --loop
    ```
 
 ### Linux 用户
@@ -73,14 +72,12 @@
 2. 运行程序：
    ```bash
    ./CC98Autosign
-   ./CC98Autosign --loop
    ```
 
 ### Python 源码运行
 
 ```bash
 python main.py
-python main.py --loop
 ```
 
 这将执行一次签到操作，完成后程序自动退出。
