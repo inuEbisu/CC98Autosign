@@ -1,0 +1,10 @@
+__pycache__
+.env
+.mypy_cache
+.vscode
+config.json
+config.py
+build
+dist
+venv
+*.spec
