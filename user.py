@@ -29,8 +29,9 @@ class User:
     CLIENT_ID = "9a1fd200-8687-44b1-4c20-08d50a96e5cd"
     CLIENT_SECRET = "8b53f727-08e2-4509-8857-e34bf92b27f2"
 
-    def __init__(self):
+    def __init__(self, session = requests.Session()) -> None:
         self.token: Optional[str] = None
+        self.session = session
 
     def login(
         self,
@@ -66,7 +67,7 @@ class User:
             }
 
             try:
-                resp = requests.post(self.LOGIN_URL, data=data)
+                resp = self.session.post(self.LOGIN_URL, data=data)
                 resp.raise_for_status()
                 self.token = resp.json()["access_token"]
             except requests.RequestException as e:
@@ -96,7 +97,7 @@ class User:
         }
 
         try:
-            resp = requests.post(self.API_URL, headers=headers)
+            resp = self.session.post(self.API_URL, headers=headers)
             if resp.status_code == 200:
                 return True
             elif resp.text == "has_signed_in_today":
@@ -127,7 +128,7 @@ class User:
         }
 
         try:
-            resp = requests.get(self.API_URL, headers=headers)
+            resp = self.session.get(self.API_URL, headers=headers)
             resp.raise_for_status()
             return resp.json()
         except requests.RequestException as e:
