@@ -5,15 +5,21 @@ import argparse
 import json
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 from log import logger
 from user import User, AuthenticationError, SignInError
+import requests
+import ZJUWebVPN
 
 
 def create_sample_config():
     """创建示例配置文件"""
     sample_config = {
+        "webvpn": {
+            "username": "your_webvpn_username",
+            "password": "your_webvpn_password",
+        },
         "users": [
             {"username": "your_username1", "password": "your_password1"},
             {"username": "your_username2", "password": "your_password2"},
@@ -25,15 +31,51 @@ def create_sample_config():
 
 def time_format(raw: Optional[str]) -> str:
     if not raw:
-        raw = "1970-01-01T08:00:00.0000000"
-    return datetime.fromisoformat(raw.replace("Z", "+00:00")).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
+        return "1970-01-01 08:00:00"
+    
+    # 处理包含时区信息的格式
+    if raw.endswith('Z'):
+        raw = raw[:-1] + "+00:00"
+    
+    # 标准化微秒部分为6位
+    if '.' in raw:
+        date_part, time_part = raw.split('.')
+        time_part = time_part.split('+')[0].split('-')[0]  # 提取微秒部分
+        if len(time_part) > 6:
+            time_part = time_part[:6]  # 截断超过6位的微秒
+        elif len(time_part) < 6:
+            time_part = time_part.ljust(6, '0')  # 补全不足6位的微秒
+        normalized = f"{date_part}.{time_part}"
+    else:
+        normalized = raw
 
+    # 解析时间
+    try:
+        dt = datetime.fromisoformat(normalized)
+    except ValueError as e:
+        logger.error(f"时间解析失败: {normalized}, 错误: {str(e)}")
+        return "Invalid time format"
+    
+    # 转换到北京时间 (UTC+8)
+    dt = dt.astimezone(timezone(timedelta(hours=8)))
+    return dt.strftime("%Y-%m-%d %H:%M:%S")
 
-def process_user(user_data: dict) -> bool:
+def check_network() -> int:
+    """
+    浙江大学镜像站提供的检查网络环境的api
+    
+    Returns:
+        0: 非校园网
+        1: 校园网 IPv4
+        2: 校园网 IPv6
+    """
+    network_check_api_url = "https://mirrors.zju.edu.cn/api/is_campus_network"
+    response = requests.get(network_check_api_url)
+    return int(response.text)
+
+def process_user(user_data: dict, session = requests.Session()) -> bool:
     """处理单个用户的签到"""
-    user = User()
+    user = User(session)
     try:
         # 登录
         user.login(user_data["username"], user_data["password"])
@@ -78,13 +120,31 @@ def batch():
         if not config.get("users"):
             logger.critical("配置文件中没有找到用户信息！")
             raise ValueError("No user info in config")
+        
+        network_type = check_network()
+        network_types = ["非校园网", "校园网 IPv4", "校园网 IPv6"]
+        logger.info(f"当前网络环境：{network_types[network_type]}")
+
+        if not network_type:
+            if not config.get("webvpn"):
+                logger.critical("当前网络环境非校园网，请在 config.json 中配置 WebVPN 用户名和密码")
+                raise ValueError("No webvpn info in config")
+            else:
+                try:
+                    session = ZJUWebVPN.ZJUWebVPNSession(config["webvpn"]["username"], config["webvpn"]["password"])
+                    logger.success(f"WebVPN 登录成功")
+                except Exception as e:
+                    logger.error(f"WebVPN 登录失败：{str(e)}")
+                    raise e
+        else:
+            session = requests.Session()
 
         total_users = len(config["users"])
         success_count = 0
         logger.info(f"开始处理 {total_users} 个用户的签到...")
         logger.info("-" * 50)
         for user_data in config["users"]:
-            if process_user(user_data):
+            if process_user(user_data, session):
                 success_count += 1
             logger.info("-" * 50)
 
