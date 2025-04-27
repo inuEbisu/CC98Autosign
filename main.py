@@ -105,56 +105,27 @@ def process_user(user_data: dict, session = requests.Session()) -> bool:
         return False
 
 
-def batch():
-    if not os.path.exists("config.json"):
-        logger.critical("配置文件 config.json 不存在，正在创建示例配置文件...")
-        create_sample_config()
-        logger.info(
-            "已创建示例配置文件 config.json，请修改其中的用户名和密码后重新运行程序"
-        )
-        raise FileNotFoundError("File does not exist")
+def batch(config: dict, session: requests.Session) -> None:
+    """批量处理用户签到
+    
+    Args:
+        config: 配置信息字典
+        session: 已初始化的会话对象
+    """
+    if not config.get("users"):
+        logger.critical("配置文件中没有找到用户信息！")
+        raise ValueError("No user info in config")
 
-    try:
-        with open("config.json", "r", encoding="utf-8") as f:
-            config = json.load(f)
-        if not config.get("users"):
-            logger.critical("配置文件中没有找到用户信息！")
-            raise ValueError("No user info in config")
-        
-        network_type = check_network()
-        network_types = ["非校园网", "校园网 IPv4", "校园网 IPv6"]
-        logger.info(f"当前网络环境：{network_types[network_type]}")
-
-        if not network_type:
-            if not config.get("webvpn"):
-                logger.critical("当前网络环境非校园网，请在 config.json 中配置 WebVPN 用户名和密码")
-                raise ValueError("No webvpn info in config")
-            else:
-                try:
-                    session = ZJUWebVPN.ZJUWebVPNSession(config["webvpn"]["username"], config["webvpn"]["password"])
-                    logger.success(f"WebVPN 登录成功")
-                except Exception as e:
-                    logger.error(f"WebVPN 登录失败：{str(e)}")
-                    raise e
-        else:
-            session = requests.Session()
-
-        total_users = len(config["users"])
-        success_count = 0
-        logger.info(f"开始处理 {total_users} 个用户的签到...")
+    total_users = len(config["users"])
+    success_count = 0
+    logger.info(f"开始处理 {total_users} 个用户的签到...")
+    logger.info("-" * 50)
+    for user_data in config["users"]:
+        if process_user(user_data, session):
+            success_count += 1
         logger.info("-" * 50)
-        for user_data in config["users"]:
-            if process_user(user_data, session):
-                success_count += 1
-            logger.info("-" * 50)
 
-        logger.info(f"签到完成！成功处理 {success_count}/{total_users} 个用户")
-    except json.JSONDecodeError as e:
-        logger.critical("配置文件格式错误！请检查 config.json 的格式是否正确")
-        raise e
-    except Exception as e:
-        logger.critical(f"程序运行出错：{str(e)}")
-        raise e
+    logger.info(f"签到完成！成功处理 {success_count}/{total_users} 个用户")
 
 
 if __name__ == "__main__":
@@ -166,7 +137,42 @@ if __name__ == "__main__":
 
     while True:
         try:
-            batch()
+            # 检查配置文件
+            if not os.path.exists("config.json"):
+                logger.critical("配置文件 config.json 不存在，正在创建示例配置文件...")
+                create_sample_config()
+                logger.info(
+                    "已创建示例配置文件 config.json，请修改其中的用户名和密码后重新运行程序"
+                )
+                raise FileNotFoundError("File does not exist")
+
+            # 读取配置文件
+            with open("config.json", "r", encoding="utf-8") as f:
+                config = json.load(f)
+
+            # 检查网络环境
+            network_type = check_network()
+            network_types = ["非校园网", "校园网 IPv4", "校园网 IPv6"]
+            logger.info(f"当前网络环境：{network_types[network_type]}")
+
+            # 初始化会话
+            if not network_type:
+                if not config.get("webvpn"):
+                    logger.critical("当前网络环境非校园网，请在 config.json 中配置 WebVPN 用户名和密码")
+                    raise ValueError("No webvpn info in config")
+                else:
+                    try:
+                        session = ZJUWebVPN.ZJUWebVPNSession(config["webvpn"]["username"], config["webvpn"]["password"])
+                        logger.success(f"WebVPN 登录成功")
+                    except Exception as e:
+                        logger.error(f"WebVPN 登录失败：{str(e)}")
+                        raise e
+            else:
+                session = requests.Session()
+
+            # 执行批量签到
+            batch(config, session)
+
             if not args.loop:
                 break
             logger.info("等待 1 小时后再次执行...")
@@ -177,6 +183,7 @@ if __name__ == "__main__":
         except (FileNotFoundError, ValueError, json.JSONDecodeError):
             break
         except Exception as e:
+            logger.critical(f"发生错误：{str(e)}")
             logger.info("等待 10 秒后重试...")
             time.sleep(10)
             logger.info("重试中...")
