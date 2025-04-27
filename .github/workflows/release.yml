@@ -1,0 +1,75 @@
+name: Build and Release with Nuitka
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, windows-latest]
+        include:
+          - os: ubuntu-22.04
+            platform: linux
+            arch: amd64
+          - os: windows-latest
+            platform: windows
+            arch: amd64
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install nuitka
+
+    - name: Build with Nuitka
+      run: |
+        python -m nuitka --standalone --onefile --output-dir=dist --show-progress --assume-yes-for-downloads main.py
+
+    - name: Rename binary on Linux
+      if: matrix.os == 'ubuntu-22.04'
+      shell: bash
+      run: |
+        mkdir bin
+        mv dist/main.bin bin/CC98Autosign-${{ matrix.platform }}-${{ matrix.arch }}
+  
+    - name: Rename binary on Windows
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        mkdir bin
+        move dist\main.exe bin\CC98Autosign-${{ matrix.platform }}-${{ matrix.arch }}.exe
+
+    - name: Upload binary artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: CC98Autosign-${{ matrix.platform }}-${{ matrix.arch }}
+        path: bin/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: ./artifacts
+
+    - name: Create Release and Upload binaries
+      uses: softprops/action-gh-release@v2
+      with:
+        generate_release_notes: true
+        files: ./artifacts/**/*
