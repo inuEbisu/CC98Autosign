@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import Optional
 from log import logger
 from user import User, AuthenticationError, SignInError
+import requests
 
 
 def create_sample_config():
@@ -30,6 +31,18 @@ def time_format(raw: Optional[str]) -> str:
         "%Y-%m-%d %H:%M:%S"
     )
 
+def check_network() -> int:
+    """
+    浙江大学镜像站提供的检查网络环境的api
+    
+    Returns:
+        0: 非校园网
+        1: 校园网 IPv4
+        2: 校园网 IPv6
+    """
+    network_check_api_url = "https://mirrors.zju.edu.cn/api/is_campus_network"
+    response = requests.get(network_check_api_url)
+    return int(response.text)
 
 def process_user(user_data: dict) -> bool:
     """处理单个用户的签到"""
