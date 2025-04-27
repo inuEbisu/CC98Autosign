@@ -1,7 +1,8 @@
-# CC98自动签到程序
+# CC98Autosign
 
 这是一个自动为 CC98 论坛用户进行每日签到的 Python 程序。
 
+[![License](https://img.shields.io/static/v1?label=License&message=WTFPL&color=lightrey)](/LICENSE.txt)
 [![Build and Release with Nuitka](https://github.com/inuEbisu/CC98Autosign/actions/workflows/release.yml/badge.svg)](https://github.com/inuEbisu/CC98Autosign/actions/workflows/release.yml)
 
 ## 功能特点
@@ -36,8 +37,8 @@
 
 1. 前往 [Releases](https://github.com/inuEbisu/CC98Autosign/releases) 页面
 2. 根据你的操作系统下载对应的文件：
-   - Windows 用户下载 `CC98Autosign.exe`
-   - Linux 用户下载 `CC98Autosign`
+   - Windows 用户下载 `CC98Autosign-windows-amd64.exe`
+   - Linux 用户下载 `CC98Autosign-linux-amd64`
 3. 将下载的文件放在任意目录下
 4. 首次运行时会自动创建 `config.json` 文件，只需修改其中的用户名和密码即可
 
@@ -150,6 +151,15 @@ python main.py --loop  # Python
 ## 贡献
 
 欢迎提交 Issue 和 Pull Request 来帮助改进这个项目。
+
+### 提交规范
+
+本项目使用[约定式提交](https://www.conventionalcommits.org/zh-hans/v1.0.0/)规范。
+
+### 贡献者列表
+<a href="https://github.com/inuEbisu/CC98Autosign/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=inuEbisu/CC98Autosign" />
+</a>
 
 ## License
 
