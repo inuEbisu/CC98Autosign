@@ -10,11 +10,16 @@ from typing import Optional
 from log import logger
 from user import User, AuthenticationError, SignInError
 import requests
+import ZJUWebVPN
 
 
 def create_sample_config():
     """创建示例配置文件"""
     sample_config = {
+        "webvpn": {
+            "username": "your_webvpn_username",
+            "password": "your_webvpn_password",
+        },
         "users": [
             {"username": "your_username1", "password": "your_password1"},
             {"username": "your_username2", "password": "your_password2"},
@@ -44,9 +49,9 @@ def check_network() -> int:
     response = requests.get(network_check_api_url)
     return int(response.text)
 
-def process_user(user_data: dict) -> bool:
+def process_user(user_data: dict, session = requests.Session()) -> bool:
     """处理单个用户的签到"""
-    user = User()
+    user = User(session)
     try:
         # 登录
         user.login(user_data["username"], user_data["password"])
@@ -91,13 +96,31 @@ def batch():
         if not config.get("users"):
             logger.critical("配置文件中没有找到用户信息！")
             raise ValueError("No user info in config")
+        
+        network_type = check_network()
+        network_types = ["非校园网", "校园网 IPv4", "校园网 IPv6"]
+        logger.info(f"当前网络环境：{network_types[network_type]}")
+
+        if not network_type:
+            if not config.get("webvpn"):
+                logger.critical("当前网络环境非校园网，请在 config.json 中配置 WebVPN 用户名和密码")
+                raise ValueError("No webvpn info in config")
+            else:
+                try:
+                    session = ZJUWebVPN.ZJUWebVPNSession(config["webvpn"]["username"], config["webvpn"]["password"])
+                    logger.success(f"WebVPN 登录成功")
+                except Exception as e:
+                    logger.error(f"WebVPN 登录失败：{str(e)}")
+                    raise e
+        else:
+            session = requests.Session()
 
         total_users = len(config["users"])
         success_count = 0
         logger.info(f"开始处理 {total_users} 个用户的签到...")
         logger.info("-" * 50)
         for user_data in config["users"]:
-            if process_user(user_data):
+            if process_user(user_data, session):
                 success_count += 1
             logger.info("-" * 50)
 

@@ -1,4 +1,8 @@
 {
+    "webvpn": {
+        "username": "your_webvpn_username",
+        "password": "your_webvpn_password"
+    },
     "users": [
         {
             "username": "your_username1",
