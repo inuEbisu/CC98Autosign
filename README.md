@@ -13,9 +13,9 @@
 
 ## 使用步骤
 
-### 方法一：使用 Github Actions（推荐）
+### 方法一：使用 GitHub Actions（推荐）
 
-该仓库已配置 Github Actions，可实现每天早上 8:00 自动签到
+该仓库已配置 GitHub Actions，可实现每天早上 8:00 自动签到
 
 #### 配置
 1. Fork 该仓库
