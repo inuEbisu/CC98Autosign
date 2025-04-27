@@ -5,7 +5,7 @@ import argparse
 import json
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 from log import logger
 from user import User, AuthenticationError, SignInError
@@ -31,10 +31,34 @@ def create_sample_config():
 
 def time_format(raw: Optional[str]) -> str:
     if not raw:
-        raw = "1970-01-01T08:00:00.0000000"
-    return datetime.fromisoformat(raw.replace("Z", "+00:00")).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
+        return "1970-01-01 08:00:00"
+    
+    # 处理包含时区信息的格式
+    if raw.endswith('Z'):
+        raw = raw[:-1] + "+00:00"
+    
+    # 标准化微秒部分为6位
+    if '.' in raw:
+        date_part, time_part = raw.split('.')
+        time_part = time_part.split('+')[0].split('-')[0]  # 提取微秒部分
+        if len(time_part) > 6:
+            time_part = time_part[:6]  # 截断超过6位的微秒
+        elif len(time_part) < 6:
+            time_part = time_part.ljust(6, '0')  # 补全不足6位的微秒
+        normalized = f"{date_part}.{time_part}"
+    else:
+        normalized = raw
+
+    # 解析时间
+    try:
+        dt = datetime.fromisoformat(normalized)
+    except ValueError as e:
+        logger.error(f"时间解析失败: {normalized}, 错误: {str(e)}")
+        return "Invalid time format"
+    
+    # 转换到北京时间 (UTC+8)
+    dt = dt.astimezone(timezone(timedelta(hours=8)))
+    return dt.strftime("%Y-%m-%d %H:%M:%S")
 
 def check_network() -> int:
     """
