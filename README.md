@@ -54,16 +54,20 @@
 
 ```json
 {
-   "users": [
-      {
-         "username": "your_username1",
-         "password": "your_password1"
-      },
-      {
-         "username": "your_username2",
-         "password": "your_password2"
-      }
-   ]
+    "webvpn": {
+        "username": "your_webvpn_username",
+        "password": "your_webvpn_password"
+    },
+    "users": [
+        {
+            "username": "your_username1",
+            "password": "your_password1"
+        },
+        {
+            "username": "your_username2",
+            "password": "your_password2"
+        }
+    ]
 }
 ```
 
