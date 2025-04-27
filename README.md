@@ -2,6 +2,8 @@
 
 这是一个自动为 CC98 论坛用户进行每日签到的 Python 程序。
 
+[![Build and Release with Nuitka](https://github.com/inuEbisu/CC98Autosign/actions/workflows/release.yml/badge.svg)](https://github.com/inuEbisu/CC98Autosign/actions/workflows/release.yml)
+
 ## 功能特点
 
 - 支持多账号批量签到
