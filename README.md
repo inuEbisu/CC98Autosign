@@ -59,20 +59,20 @@
 
 ```json
 {
-    "webvpn": {
-        "username": "your_webvpn_username",
-        "password": "your_webvpn_password"
-    },
-    "users": [
-        {
-            "username": "your_username1",
-            "password": "your_password1"
-        },
-        {
-            "username": "your_username2",
-            "password": "your_password2"
-        }
-    ]
+   "webvpn": {
+      "username": "your_webvpn_username",
+      "password": "your_webvpn_password"
+   },
+   "users": [
+      {
+         "username": "your_username1",
+         "password": "your_password1"
+      },
+      {
+         "username": "your_username2",
+         "password": "your_password2"
+      }
+   ]
 }
 ```
 
@@ -117,7 +117,9 @@ CC98Autosign.exe --loop  # Windows
 python main.py --loop  # Python
 ```
 
-对于高级 Linux 用户，我们建议使用 `crontab` 来统一管理计划任务：
+### Crontab
+
+对于 Linux 用户，可以使用 `crontab` 来统一管理计划任务：
 
 ```bash
 crontab -e
