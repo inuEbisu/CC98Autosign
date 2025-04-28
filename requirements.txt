@@ -6,4 +6,4 @@ loguru==0.7.3
 requests==2.32.3
 urllib3==2.4.0
 win32_setctime==1.2.0
-zjuwebvpn==0.1.4
+zjuwebvpn==0.1.5
