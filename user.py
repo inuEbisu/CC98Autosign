@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from typing import Any, Dict, Optional, Union
+
 import requests
-from typing import Optional, Dict, Any
 
 
 class CC98Error(Exception):
@@ -29,7 +30,7 @@ class User:
     CLIENT_ID = "9a1fd200-8687-44b1-4c20-08d50a96e5cd"
     CLIENT_SECRET = "8b53f727-08e2-4509-8857-e34bf92b27f2"
 
-    def __init__(self, session = requests.Session()) -> None:
+    def __init__(self, session: requests.Session = requests.Session()) -> None:
         self.token: Optional[str] = None
         self.session = session
 
@@ -108,12 +109,14 @@ class User:
         except requests.RequestException as e:
             raise SignInError(e)
 
-    def get_sign_info(self) -> Dict[str, Any]:
+    def get_sign_info(self) -> Union[Dict[str, Any], Any]:
         """
         Get sign-in information.
 
         Returns:
-            Dict[str, Any]: Sign-in information
+            Union[Dict[str, Any], Any]: Sign-in information (if any) containing
+                lastSignInTime (str), lastReward (int), lastSignInCount (int),
+                and hasSignedInToday (bool)
 
         Raises:
             AuthenticationError: Raised when not logged in
