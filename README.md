@@ -126,15 +126,7 @@ crontab -e
 0 8 * * * cd (config.json所在目录) && (CC98Autosign可执行文件的路径)
 ```
 
-> `0 8 * * *` 是一个 Cron 表达式，用于指定定时任务的执行时间。它的格式如下：  
-> 
-> * * * * *    
-> │ │ │ │ │    
-> │ │ │ │ └─ 周几（0 - 6）(0表示周日)  
-> │ │ │ └─── 月份（1 - 12）  
-> │ │ └───── 日期（1 - 31）  
-> │ └─────── 小时（0 - 23）  
-> └───────── 分钟（0 - 59）  
+> `0 8 * * *` 是一个 Cron 表达式，用于指定定时任务的执行时间。更多信息详见 [Cron](https://en.wikipedia.org/wiki/Cron)
 
 ### 程序输出说明
 
@@ -176,6 +168,17 @@ crontab -e
 ### 提交规范
 
 本项目使用[约定式提交](https://www.conventionalcommits.org/zh-hans/v1.0.0/)规范。
+
+### 开发环境配置
+
+为了确保代码风格和格式的一致性，本项目使用了 pre-commit 工具链。贡献者 clone 仓库后，需要手动安装 pre-commit 并执行以下命令启用：
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+这样，每次 commit 时 pre-commit 会自动运行检查。
 
 ### 贡献者列表
 <a href="https://github.com/inuEbisu/CC98Autosign/graphs/contributors">

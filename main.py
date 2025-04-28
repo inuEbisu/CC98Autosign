@@ -5,15 +5,17 @@ import argparse
 import json
 import os
 import time
-from datetime import datetime, timezone, timedelta
-from typing import Optional
-from log import logger
-from user import User, AuthenticationError, SignInError
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, Optional
+
 import requests
 import ZJUWebVPN
 
+from log import logger
+from user import AuthenticationError, SignInError, User
 
-def create_sample_config():
+
+def create_sample_config() -> None:
     """创建示例配置文件"""
     sample_config = {
         "webvpn": {
@@ -23,7 +25,7 @@ def create_sample_config():
         "users": [
             {"username": "your_username1", "password": "your_password1"},
             {"username": "your_username2", "password": "your_password2"},
-        ]
+        ],
     }
     with open("config.json", "w", encoding="utf-8") as f:
         json.dump(sample_config, f, ensure_ascii=False, indent=4)
@@ -32,19 +34,19 @@ def create_sample_config():
 def time_format(raw: Optional[str]) -> str:
     if not raw:
         return "1970-01-01 08:00:00"
-    
+
     # 处理包含时区信息的格式
-    if raw.endswith('Z'):
+    if raw.endswith("Z"):
         raw = raw[:-1] + "+00:00"
-    
+
     # 标准化微秒部分为6位
-    if '.' in raw:
-        date_part, time_part = raw.split('.')
-        time_part = time_part.split('+')[0].split('-')[0]  # 提取微秒部分
+    if "." in raw:
+        date_part, time_part = raw.split(".")
+        time_part = time_part.split("+")[0].split("-")[0]  # 提取微秒部分
         if len(time_part) > 6:
             time_part = time_part[:6]  # 截断超过6位的微秒
         elif len(time_part) < 6:
-            time_part = time_part.ljust(6, '0')  # 补全不足6位的微秒
+            time_part = time_part.ljust(6, "0")  # 补全不足6位的微秒
         normalized = f"{date_part}.{time_part}"
     else:
         normalized = raw
@@ -55,12 +57,15 @@ def time_format(raw: Optional[str]) -> str:
     except ValueError as e:
         logger.error(f"时间解析失败: {normalized}, 错误: {str(e)}")
         return "Invalid time format"
-    
+
     # 转换到北京时间 (UTC+8)
     dt = dt.astimezone(timezone(timedelta(hours=8)))
     return dt.strftime("%Y-%m-%d %H:%M:%S")
 
-def process_user(user_data: dict, session = requests.Session()) -> bool:
+
+def process_user(
+    user_data: Dict[str, str], session: requests.Session = requests.Session()
+) -> bool:
     """处理单个用户的签到"""
     user = User(session)
     try:
@@ -92,9 +97,9 @@ def process_user(user_data: dict, session = requests.Session()) -> bool:
         return False
 
 
-def batch(config: dict, session: requests.Session) -> None:
+def batch(config: Dict[str, Any], session: requests.Session) -> None:
     """批量处理用户签到
-    
+
     Args:
         config: 配置信息字典
         session: 已初始化的会话对象
@@ -145,12 +150,16 @@ if __name__ == "__main__":
             # 初始化会话
             if not network_type:
                 if not config.get("webvpn"):
-                    logger.critical("当前网络环境非校园网，请在 config.json 中配置 WebVPN 用户名和密码")
+                    logger.critical(
+                        "当前网络环境非校园网，请在 config.json 中配置 WebVPN 用户名和密码"
+                    )
                     raise ValueError("No webvpn info in config")
                 else:
                     try:
-                        session = ZJUWebVPN.ZJUWebVPNSession(config["webvpn"]["username"], config["webvpn"]["password"])
-                        logger.success(f"WebVPN 登录成功")
+                        session = ZJUWebVPN.ZJUWebVPNSession(
+                            config["webvpn"]["username"], config["webvpn"]["password"]
+                        )
+                        logger.success("WebVPN 登录成功")
                     except Exception as e:
                         logger.error(f"WebVPN 登录失败：{str(e)}")
                         raise e

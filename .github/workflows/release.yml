@@ -45,7 +45,7 @@ jobs:
       run: |
         mkdir bin
         mv dist/main.bin bin/CC98Autosign-${{ matrix.platform }}-${{ matrix.arch }}
-  
+
     - name: Rename binary on Windows
       if: matrix.os == 'windows-latest'
       shell: pwsh
