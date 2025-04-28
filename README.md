@@ -43,7 +43,7 @@
 出于项目安全性的考虑，checkin.yml 处于停用状态
 
 #### 配置
-1. 下载该仓库的全部内容自建仓库（请勿 fork 该仓库）
+1. 点击仓库页面右上角的 Use this template 自建仓库（请勿 fork 该仓库）
 2. 恢复 ./github/workflows/checkin.yml 的重命名
 3. 进入你自己的仓库的 Settings → Secrets → Actions
 4. 点击 New repository secret 按钮
