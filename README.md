@@ -43,7 +43,7 @@
 出于项目安全性的考虑，checkin.yml 处于停用状态
 
 #### 配置
-1. 下载该仓库的全部内容自建仓库（请勿 fork 该仓库）
+1. 点击仓库页面右上角的 Use this template 自建仓库（请勿 fork 该仓库）
 2. 恢复 ./github/workflows/checkin.yml 的重命名
 3. 进入你自己的仓库的 Settings → Secrets → Actions
 4. 点击 New repository secret 按钮
@@ -59,20 +59,20 @@
 
 ```json
 {
-    "webvpn": {
-        "username": "your_webvpn_username",
-        "password": "your_webvpn_password"
-    },
-    "users": [
-        {
-            "username": "your_username1",
-            "password": "your_password1"
-        },
-        {
-            "username": "your_username2",
-            "password": "your_password2"
-        }
-    ]
+   "webvpn": {
+      "username": "your_webvpn_username",
+      "password": "your_webvpn_password"
+   },
+   "users": [
+      {
+         "username": "your_username1",
+         "password": "your_password1"
+      },
+      {
+         "username": "your_username2",
+         "password": "your_password2"
+      }
+   ]
 }
 ```
 
@@ -117,7 +117,9 @@ CC98Autosign.exe --loop  # Windows
 python main.py --loop  # Python
 ```
 
-对于高级 Linux 用户，我们建议使用 `crontab` 来统一管理计划任务：
+### Crontab
+
+对于 Linux 用户，可以使用 `crontab` 来统一管理计划任务：
 
 ```bash
 crontab -e
