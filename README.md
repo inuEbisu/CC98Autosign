@@ -16,22 +16,7 @@
 
 ## 使用步骤
 
-### 方法一：使用 GitHub Actions（推荐）
-
-该仓库已配置 GitHub Actions，可实现每天早上 8:00 自动签到
-
-#### 配置
-1. Fork 该仓库
-2. 进入你自己的仓库的 Settings → Secrets → Actions
-3. 点击 New repository secret 按钮
-4. 添加以下 Secret：
-
-| Secret 名称   | 值内容                                |
-|--------------|-------------------------------------|
-| CONFIG_DATA  | 完整的 config.json 文件内容（保持JSON格式） |
-
-
-### 方法二：使用预编译二进制文件
+### 方法一：使用预编译二进制文件
 
 该办法无需安装 Python。
 
@@ -42,7 +27,7 @@
 3. 将下载的文件放在任意目录下
 4. 首次运行时会自动创建 `config.json` 文件，只需修改其中的用户名和密码即可
 
-### 方法三：从源码运行
+### 方法二：从源码运行
 
 1. 确保你的系统已安装 Python 3.13（3.x 应该都行，不过没测试过）
 2. 克隆/下载本项目到本地
@@ -51,26 +36,43 @@
    pip install -r requirements.txt
    ```
 
+### 方法三：使用 GitHub Actions
+
+该仓库已配置 GitHub Actions，可实现每天早上 8:00 自动签到
+
+出于项目安全性的考虑，checkin.yml 处于停用状态
+
+#### 配置
+1. 点击仓库页面右上角的 Use this template 自建仓库（请勿 fork 该仓库）
+2. 恢复 ./github/workflows/checkin.yml 的重命名
+3. 进入你自己的仓库的 Settings → Secrets → Actions
+4. 点击 New repository secret 按钮
+5. 添加以下 Secret：
+
+| Secret 名称   | 值内容                                |
+|--------------|-------------------------------------|
+| CONFIG_DATA  | 完整的 config.json 文件内容（保持JSON格式） |
+
 ## 配置说明
 
 程序会在首次运行时自动创建 `config.json` 文件，你只需要修改其中的用户名和密码即可；也支持按照 JSON 格式添加更多的用户账号。配置文件格式如下：
 
 ```json
 {
-    "webvpn": {
-        "username": "your_webvpn_username",
-        "password": "your_webvpn_password"
-    },
-    "users": [
-        {
-            "username": "your_username1",
-            "password": "your_password1"
-        },
-        {
-            "username": "your_username2",
-            "password": "your_password2"
-        }
-    ]
+   "webvpn": {
+      "username": "your_webvpn_username",
+      "password": "your_webvpn_password"
+   },
+   "users": [
+      {
+         "username": "your_username1",
+         "password": "your_password1"
+      },
+      {
+         "username": "your_username2",
+         "password": "your_password2"
+      }
+   ]
 }
 ```
 
@@ -115,7 +117,9 @@ CC98Autosign.exe --loop  # Windows
 python main.py --loop  # Python
 ```
 
-对于高级 Linux 用户，我们建议使用 `crontab` 来统一管理计划任务：
+### Crontab
+
+对于 Linux 用户，可以使用 `crontab` 来统一管理计划任务：
 
 ```bash
 crontab -e
