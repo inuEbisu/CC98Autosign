@@ -60,19 +60,6 @@ def time_format(raw: Optional[str]) -> str:
     dt = dt.astimezone(timezone(timedelta(hours=8)))
     return dt.strftime("%Y-%m-%d %H:%M:%S")
 
-def check_network() -> int:
-    """
-    浙江大学镜像站提供的检查网络环境的api
-    
-    Returns:
-        0: 非校园网
-        1: 校园网 IPv4
-        2: 校园网 IPv6
-    """
-    network_check_api_url = "https://mirrors.zju.edu.cn/api/is_campus_network"
-    response = requests.get(network_check_api_url)
-    return int(response.text)
-
 def process_user(user_data: dict, session = requests.Session()) -> bool:
     """处理单个用户的签到"""
     user = User(session)
@@ -151,7 +138,7 @@ if __name__ == "__main__":
                 config = json.load(f)
 
             # 检查网络环境
-            network_type = check_network()
+            network_type = ZJUWebVPN.check_network()
             network_types = ["非校园网", "校园网 IPv4", "校园网 IPv6"]
             logger.info(f"当前网络环境：{network_types[network_type]}")
 
