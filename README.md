@@ -49,9 +49,9 @@
 4. 点击 New repository secret 按钮
 5. 添加以下 Secret：
 
-| Secret 名称   | 值内容                                |
-|--------------|-------------------------------------|
-| CONFIG_DATA  | 完整的 config.json 文件内容（保持JSON格式） |
+| Secret 名称 | 值内容                                      |
+| ----------- | ------------------------------------------- |
+| CONFIG_DATA | 完整的 config.json 文件内容（保持JSON格式） |
 
 ## 配置说明
 
@@ -172,17 +172,6 @@ crontab -e
 ### 提交规范
 
 本项目使用[约定式提交](https://www.conventionalcommits.org/zh-hans/v1.0.0/)规范。
-
-### 开发环境配置
-
-为了确保代码风格和格式的一致性，本项目使用了 pre-commit 工具链。贡献者 clone 仓库后，需要手动安装 pre-commit 并执行以下命令启用：
-
-```bash
-pip install pre-commit
-pre-commit install
-```
-
-这样，每次 commit 时 pre-commit 会自动运行检查。
 
 ### 贡献者列表
 <a href="https://github.com/inuEbisu/CC98Autosign/graphs/contributors">

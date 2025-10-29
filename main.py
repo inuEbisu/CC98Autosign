@@ -143,7 +143,7 @@ if __name__ == "__main__":
                 config = json.load(f)
 
             # 检查网络环境
-            network_type = ZJUWebVPN.check_network()
+            network_type = ZJUWebVPN.ZJUWebVPNSession.check_network()
             network_types = ["非校园网", "校园网 IPv4", "校园网 IPv6"]
             logger.info(f"当前网络环境：{network_types[network_type]}")
 
